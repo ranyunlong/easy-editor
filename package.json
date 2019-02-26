@@ -3,13 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "calculate-size": "^1.1.1",
+    "prop-types": "^15.7.2",
+    "react": "^16.8.3",
+    "react-dom": "^16.8.3",
+    "react-scripts": "2.1.5"
+  },
+  "devDependencies": {
     "@types/jest": "24.0.6",
     "@types/node": "11.9.5",
     "@types/react": "16.8.4",
     "@types/react-dom": "16.8.2",
-    "react": "^16.8.3",
-    "react-dom": "^16.8.3",
-    "react-scripts": "2.1.5",
+    "node-sass": "^4.11.0",
     "typescript": "3.3.3333"
   },
   "scripts": {
