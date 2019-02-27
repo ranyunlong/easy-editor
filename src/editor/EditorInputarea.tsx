@@ -58,7 +58,7 @@ export class EditorInputarea extends Component<IEditorInputareaProp, IEditorInpu
                 onKeyDown={this.handleEditorInputareaKeydown.bind(this)}
                 onSelect={(e) => {
                     e.persist()
-                    console.log(e)  
+                    // console.log(e)  
                 }}
                 style={{
                     position: 'absolute',

@@ -9,7 +9,6 @@ interface IEditorProps {
     setting?: {
         fontFamily?: string;
         fontSize?: number;
-        lineHeight?: number;
     }
 }
 
@@ -18,7 +17,6 @@ interface IEditorDefaultProps {
     setting: {
         fontFamily: string;
         fontSize: number;
-        lineHeight: number;
     }
 }
 
@@ -26,6 +24,7 @@ type IEditorState = Readonly<{
     isFocus: boolean;
     value: string;
     nativeTextAreaElement: HTMLTextAreaElement | null;
+    activeLine: number;
     editorSelection: {
         selectionStart: number;
         selectionEnd: number;
@@ -42,6 +41,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         isFocus: false,
         value: this.props.value || '',
         nativeTextAreaElement: null,
+        activeLine: 0,
         editorSelection: {
             selectionStart: 0,
             selectionEnd: 0
@@ -56,8 +56,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         value: '',
         setting: {
             fontFamily: `Consolas, "Courier New", monospace`,
-            fontSize: 16,
-            lineHeight: 22
+            fontSize: 16
         }
     }
 
@@ -72,7 +71,7 @@ export class Editor extends Component<IEditorProps, IEditorState> {
 
     // 处理父组件传递的更新
     componentWillReceiveProps(...args: any[]) {
-        console.log(args)
+        // console.log(args)
     }
     
     // 处理编辑器失去焦点
@@ -121,7 +120,6 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                 startLineNumber: selectlineNumber + 1,
                 endLineNumber: selectlineNumber + 1
             })
-            // return this.setCursorAndInputPosition(maxWidth, selectlineNumber * setting.lineHeight)
         } else {
             const result = selectLineValue.split('').map((str, index) => {
                 const { width } = this.getFontsWidth(selectLineValue.substr(0, index))
@@ -140,9 +138,22 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                 startLineNumber: selectlineNumber + 1,
                 endLineNumber: selectlineNumber + 1
             })
-            
-            // this.setCursorAndInputPosition(result.width, selectlineNumber * setting.lineHeight)
         }
+    }
+
+    /**
+     * 处理编辑器空白部位点击事件
+     * @param event 
+     */
+    handleSelectBlankContent(event: MouseEvent) {
+        const { value } = this.state
+        const len =  value.split('\n').length
+        this.setSelection({
+            startColumn: value.length,
+            endColumn: value.length,
+            startLineNumber: len + 1,
+            endLineNumber: len + 1
+        })
     }
 
     /**
@@ -204,7 +215,10 @@ export class Editor extends Component<IEditorProps, IEditorState> {
         const selectionStartText = value.substr(0, selectionStart)
         const lastLine = selectionStartText.split('\n').pop()
         const { width } = this.getFontsWidth(lastLine || '')
-        this.setCursorAndInputPosition(width, (range.startLineNumber - 1) * setting.lineHeight)
+        this.setState({
+            activeLine: range.startLineNumber - 1
+        })
+        this.setCursorAndInputPosition(width, (range.startLineNumber - 1) * (setting.fontSize * 1.3))
     }
 
     /**
@@ -230,9 +244,9 @@ export class Editor extends Component<IEditorProps, IEditorState> {
     }
 
     render() {
-        const { isFocus, value, cursorAndInputPosition, editorSelection } = this.state
+        const { isFocus, value, cursorAndInputPosition, activeLine } = this.state
         const { setting } = this.props as IEditorDefaultProps
-        const { fontSize, fontFamily, lineHeight } = setting
+        const { fontSize, fontFamily } = setting
         return (
             <div 
                 className={'easy-editor' + isFocus ? ' focused' : ''}
@@ -244,16 +258,25 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                     left: 0,
                     width: '100%',
                     height: '100%',
-                    background: 'pink'
+                    background: 'pink',
+                    overflow: 'hidden'
                 }}
             >
                 <EditorLinesContent
+                    activeLine={activeLine}
                     onSelectLine={this.handleSelectLine.bind(this)}
+                    onSelectBlankContent={this.handleSelectBlankContent.bind(this)}
                     value={value}
                     fontSize={fontSize}
                     fontFamily={fontFamily}
-                    lineHeight={lineHeight}
-                />
+                    lineHeight={fontSize * 1.3}
+                >
+                    <EditorCursor
+                        height={fontSize * 1.3}
+                        show={isFocus}
+                        position={cursorAndInputPosition}
+                    />
+                </EditorLinesContent>
                 <EditorInputarea
                     ref="inputarea"
                     value={value}
@@ -262,11 +285,6 @@ export class Editor extends Component<IEditorProps, IEditorState> {
                     onBlur={() => this.setState({isFocus: false})}
                     onKeyDown={this.handleEditorKeyDown.bind(this)}
                     focused={isFocus}
-                />
-                <EditorCursor
-                    height={lineHeight}
-                    show={isFocus}
-                    position={cursorAndInputPosition}
                 />
             </div>
         )
