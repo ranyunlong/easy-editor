@@ -2,13 +2,12 @@ body {
     margin: 0;
     width: 100vw;
     height: 100vh;
-    
+    overflow: hidden;
 }
 
 .my-editor {
     position: relative;
-    width: 500px;
-    height: 500px;
+    width: 100vw;
+    height: 100vh;
     border: 1px solid #ddd;
-    left: 100px;
 }

@@ -1,0 +1,19 @@
+.easy-editor-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    cursor: text;
+    white-space: pre;
+    overflow-wrap: break-word;
+    border-width: 1px;
+    border-style: solid;
+    border-color: initial;
+    border-image: initial;
+    overflow: auto;
+    padding-bottom: 100%;
+    box-sizing: border-box;
+}
